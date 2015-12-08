@@ -15,6 +15,7 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
+
 /**
  * @file
  * @author  Renato Moraes <rmoraes@inf.puc-rio.br>
@@ -72,18 +73,18 @@ class FileManipulation : public QDir
         Vector<Point> csvReaderPoints(QString fileName, const QString separator);
 
         /**
-         * @brief csvReaderMitosis - Read CSV file to getting the mitosis regions.
+         * @brief csvReaderCoordinates - Read CSV file to getting the image coordinates.
          * @param fileName - Filename.
          * @param separator - Separator.
-         * @return Return a vector with mitosis found on CSV file.
+         * @return Return a vector with coordinates found on CSV file.
          */
-        Vector<mitosis> csvReaderMitosis(QString fileName, const QString separator);
+        Vector<coordinateInfo> csvReaderCoordinates(QString fileName, const QString separator);
 
         /**
-         * @brief csvReaderVectorPoints - Read CSV file to getting especific mitosis points.
+         * @brief csvReaderVectorPoints - Read CSV file to getting especific coordinates points.
          * @param fileName - Filename.
          * @param separator - Separator.
-         * @return Return a vector with vector of especific mitosis points.
+         * @return Return a vector with vector of especific coordinates points.
          */
         Vector<Vector<Point> > csvReaderVectorPoints(QString fileName, const QString separator);
 

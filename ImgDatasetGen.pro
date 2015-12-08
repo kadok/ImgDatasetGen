@@ -16,14 +16,12 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     imagetransformation.cpp \
     ThinPlateSpline/CThinPlateSpline.cpp \
-    ThinPlateSpline/ThinPlateSpline.cpp \
     filemanipulation.cpp
 
 HEADERS  += mainwindow.h \
     imagetransformation.h \
     ThinPlateSpline/constants.h \
     ThinPlateSpline/CThinPlateSpline.h \
-    ThinPlateSpline/ThinPlateSpline.h \
     filemanipulation.h
 
 FORMS    += mainwindow.ui

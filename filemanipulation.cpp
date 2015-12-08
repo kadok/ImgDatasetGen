@@ -35,16 +35,12 @@ Vector<Point> FileManipulation::csvReaderPoints(QString fileName, const QString 
 
 }
 
-Vector<mitosis> csvReaderMitosis(QString fileName, const QString separator);
-Vector<Vector<Point> > csvReaderVectorPoints(QString fileName, const QString separator);
-void writeMitosisFiles(Vector<mitosis> mitoses, Mat imageBase, QString destinyPath, QString fileName, Size size);
-
-Vector<mitosis> FileManipulation::csvReaderMitosis(QString fileName, const QString separator)
+Vector<coordinateInfo> FileManipulation::csvReaderCoordinates(QString fileName, const QString separator)
 {
-    Vector<mitosis> pointVector;
+    Vector<coordinateInfo> pointVector;
     pointVector.clear();
 
-    mitosis mitosisCoordinates;
+    coordinateInfo mCoordinates;
 
     QFile file(fileName);
     if(file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -56,11 +52,11 @@ Vector<mitosis> FileManipulation::csvReaderMitosis(QString fileName, const QStri
             QString line = textStream.readLine();
             QStringList values = line.split(separator);
 
-            mitosisCoordinates.x = values[0].toDouble();
-            mitosisCoordinates.y = values[1].toDouble();
-            mitosisCoordinates.grade = values[2].toDouble();
+            mCoordinates.x = values[0].toDouble();
+            mCoordinates.y = values[1].toDouble();
+            mCoordinates.grade = values[2].toDouble();
 
-            pointVector.push_back(mitosisCoordinates);
+            pointVector.push_back(mCoordinates);
 
         }
     }
@@ -155,9 +151,10 @@ bool FileManipulation::checkDirectoryAndCreate(QString dir, QWidget* widget)
 
         } else {
 
+            exists = false;
             QMessageBox msgBox;
             msgBox.setText("The destination directory not exist. Use a valid destination directory");
-            exists = false;
+            msgBox.exec();
 
         }
     }

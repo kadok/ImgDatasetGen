@@ -200,6 +200,9 @@
     </property>
    </widget>
    <widget class="QCheckBox" name="csvCheckBox">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -229,6 +232,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="csvLineEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -252,6 +258,9 @@
     </property>
    </widget>
    <widget class="QPushButton" name="csvPushButton">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>520</x>
@@ -317,6 +326,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="widthLineEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>150</x>
@@ -327,6 +339,9 @@
     </property>
    </widget>
    <widget class="QLineEdit" name="heightLineEdit">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>380</x>

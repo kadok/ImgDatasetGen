@@ -48,27 +48,25 @@ class MainWindow : public QMainWindow
 
 public:
     /**
-     * @brief MainWindow - Construtor da classe.
+     * @brief MainWindow - Class Constructor.
      * @param parent
      */
     explicit MainWindow(QWidget *parent = 0);
 
     /**
-     * @brief ~MainWindow - Destrutor.
+     * @brief ~MainWindow - Destructor.
      */
     ~MainWindow();
 
     /**
-     * @brief generateMain - Generate Image Transformations.
+     * @brief generateImages - Generate Image Transformations.
      */
-    void generateMain();
+    void generateImages();
 
-private:
-    Ui::MainWindow *ui;
-    QPushButton* pButton;
-    QLineEdit* pOriginalPath;
-    QLineEdit* pDestinationPath;
-    QLineEdit* pCSVPath;
+    /**
+     * @brief verifyCheckBoxes - Verify the Checkboxes.
+     */
+    void verifyCheckBoxes();
 
     bool bFlipChecked;
     bool bRotateChecked;
@@ -77,6 +75,19 @@ private:
     bool bTSPChecked;
     bool bCropChecked;
     bool bCSVChecked;
+
+    int iWidth;
+    int iHeight;
+
+    int iWindowSize;
+    int iOffset;
+
+private:
+    Ui::MainWindow *ui;
+    QPushButton* pButton;
+    QLineEdit* pOriginalPath;
+    QLineEdit* pDestinationPath;
+    QLineEdit* pCSVPath;
 
 
 protected:

@@ -3,11 +3,18 @@
 
 #include <QObject>
 #include <QImage>
+
 #include "opencv2/core/core.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
 
-struct mitosis {
+#include "mainwindow.h"
+
+#include "ThinPlateSpline/CThinPlateSpline.h"
+#include "ThinPlateSpline/constants.h"
+
+///Struct to define a coordinate extracted from a CSV file.
+struct coordinateInfo {
     double x;
     double y;
     double grade;
@@ -76,6 +83,37 @@ class ImageTransformation : public QImage
          * @return Return the image or matrix cropped.
          */
         Mat cropImage(Mat original, Point coordinate, Size rectSize, int offset);
+
+        /**
+         * @brief thinPlateSplineProcessing - Process the Thin Plate Spline on image.
+         * @param originalImage - Original image.
+         * @param destinantionPath - Destination path.
+         * @param fileName - Filename.
+         * @param iP - Points Vector.
+         * @param iiP - Points Vector.
+         */
+        void thinPlateSplineProcessing(Mat originalImage, QString destinationPath, QString fileName, std::vector<cv::Point> iP, std::vector<cv::Point> iiP);
+
+        /**
+         * @brief writeImages - Write transformed images.
+         * @param imageBase - Original image.
+         * @param destinationPath - Destination path.
+         * @param fileName - Filename.
+         * @param extension - File extension.
+         * @param mainW - MainWindow.
+         */
+        void writeImages(Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
+
+        /**
+         * @brief writeImages - Write transformed images.
+         * @param coordinates - Coordinates vector.
+         * @param imageBase - Original image.
+         * @param destinationPath - Destination path.
+         * @param fileName - Filename.
+         * @param extension - File extension.
+         * @param mainW - MainWindow.
+         */
+        void writeImages(Vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
 
 
     private:

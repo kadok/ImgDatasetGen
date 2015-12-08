@@ -41,7 +41,16 @@ MainWindow::MainWindow(QWidget *parent) :
     connect (csvPathButton, SIGNAL(clicked(bool)), signalMapper, SLOT(map())) ;
     signalMapper -> setMapping (csvPathButton, CSV_PATH) ;
 
+    QPushButton* generatePathButton = ui->generatePushButton;
+    connect (generatePathButton, SIGNAL(clicked(bool)), this, SLOT(verifyForm(bool)));
+
     connect (signalMapper, SIGNAL(mapped(int)), this, SLOT(browse(int))) ;
+    connect(ui->resizeCheckBox, SIGNAL(toggled(bool)), ui->widthLineEdit, SLOT(setEnabled(bool)));
+    connect(ui->resizeCheckBox, SIGNAL(toggled(bool)), ui->heightLineEdit, SLOT(setEnabled(bool)));
+    connect(ui->cropCheckBox, SIGNAL(toggled(bool)), ui->windowSizeLineEdit, SLOT(setEnabled(bool)));
+    connect(ui->cropCheckBox, SIGNAL(toggled(bool)), ui->csvCheckBox, SLOT(setEnabled(bool)));
+    connect(ui->csvCheckBox, SIGNAL(toggled(bool)), ui->csvLineEdit, SLOT(setEnabled(bool)));
+    connect(ui->csvCheckBox, SIGNAL(toggled(bool)), ui->csvPushButton, SLOT(setEnabled(bool)));
 
 }
 
@@ -52,25 +61,25 @@ MainWindow::~MainWindow()
 
 void MainWindow::createActions()
 {
-    newAct = new QAction(QIcon(":/project/resources/novo_24x24.png"), tr("&Novo"), this);
+    newAct = new QAction(tr("&New"), this);
     newAct->setShortcut(tr("Ctrl+N"));
-    newAct->setStatusTip(tr("Criar novo arquivo"));
+    newAct->setStatusTip(tr("Create new file"));
     connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
 
-    exitAct = new QAction(tr("Sair"), this);
+    exitAct = new QAction(tr("Quit"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
-    exitAct->setStatusTip(tr("Sair da aplicação"));
+    exitAct->setStatusTip(tr("Quit the application"));
     connect(exitAct, SIGNAL(triggered()), qApp, SLOT(closeAllWindows()));
 
-    aboutAct = new QAction(tr("Sobre"), this);
-    aboutAct->setStatusTip(tr("Mostra a janela de informação sobre a aplicação"));
+    aboutAct = new QAction(tr("About"), this);
+    aboutAct->setStatusTip(tr("Shows a window with information about this software"));
     connect(aboutAct, SIGNAL(triggered()), this, SLOT(about()));
 
 }
 
 void MainWindow::createMenus()
 {
-    fileMenu = menuBar()->addMenu(tr("&Arquivo"));
+    fileMenu = menuBar()->addMenu(tr("&File"));
     fileMenu->addAction(newAct);
 
     fileMenu->addSeparator();
@@ -79,7 +88,7 @@ void MainWindow::createMenus()
 
     menuBar()->addSeparator();
 
-    helpMenu = menuBar()->addMenu(tr("&Ajuda"));
+    helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAct);
 
 }
@@ -87,7 +96,7 @@ void MainWindow::createMenus()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("Image Dataset Generator"),
-                       tr("Versão 1.0 - © 2015 - Developed by Renato Moraes"));
+                       tr("Version 1.0 - © 2015 - Developed by Renato Moraes"));
 }
 
 void MainWindow::browse(int symbol)
@@ -118,19 +127,20 @@ void MainWindow::browse(int symbol)
     }
 }
 
-void MainWindow::generateMain()
+void MainWindow::generateImages()
 {
-    const static QString originalPath = pOriginalPath->text();
-    const static QString destinationPath = pDestinationPath->text();
-    const static QString csvPath = pCSVPath->text();
+
+    QString originalPath = pOriginalPath->text();
+    QString destinationPath = pDestinationPath->text();
+    QString csvPath;
 
     FileManipulation* manageFile = new FileManipulation();
-    if (!manageFile->checkDirectory(originalPath)) {
+    ImageTransformation* manageImage = new ImageTransformation();
 
-    } else {
+    if (manageFile->checkDirectory(originalPath))
+    {
 
         manageFile->checkDirectoryAndCreate(destinationPath, this);
-        manageFile->checkDirectoryAndCreate(csvPath, this);
 
         QDir directory(originalPath);
         directory.setSorting(QDir::Size | QDir::Reversed);
@@ -141,72 +151,145 @@ void MainWindow::generateMain()
         QFileInfoList list = directory.entryInfoList(filters, QDir::Files|QDir::NoDotAndDotDot);
 
         //std::cout << "     Bytes Filename" << std::endl;
-        for (int i = 0; i < list.size(); ++i) {
+        for (int i = 0; i < list.size(); ++i)
+        {
+            QFileInfo imageFileInfo = list.at(i);
+            QString imageFileAbsolutePath = imageFileInfo.absoluteFilePath();
+            QString imageFileName = manageFile->removeExtension(imageFileInfo.fileName());
+            QString imageFileExtension = manageFile->getExtension(imageFileInfo.fileName());
 
-            QFileInfo fileInfo = list.at(i);
             //std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));
             //std::cout << std::endl;
 
-            QString fileAbsolutePath = fileInfo.absoluteFilePath();
+            Mat imageBase = imread(imageFileAbsolutePath.toStdString());
+            Mat imageCopy;
+            imageBase.copyTo(imageCopy);
 
-            Mat imageBase = imread(fileAbsolutePath.toStdString());
+            if (bGrayChecked)
+            {
+                cv::cvtColor(imageCopy, imageCopy, CV_RGB2GRAY);
+                imwrite((destinationPath + "/" + imageFileName + "_Gray" + imageFileExtension).toStdString(), imageCopy );
+            }
 
-            ///Read CSV Files
-//            QString csvFilenamePositive = manageFile->withoutExtension(fileAbsolutePath) + positive + csv;
-//            Vector<mitosis> mitoses = manageFile->csvReaderMitosis(csvFilenamePositive, ",");
-//            QString csvFilenameNegative = manageFile->withoutExtension(fileAbsolutePath) + negative + csv;
-//            Vector<mitosis> notMitoses = manageFile->csvReaderMitosis(csvFilenameNegative, ",");
+            if (bTSPChecked)
+            {
+                /// Generate some generic points
+                /// Usually you would use a interest point detector such as SURF or SIFT
+                std::vector<cv::Point> iP, iiP;
+                manageImage->thinPlateSplineProcessing(imageCopy, destinationPath, imageFileAbsolutePath, iP, iiP);
 
+            }
 
-//            std::vector<cv::Point> iPositive, iiPositive, iNegative, iiNegative;
+            if (bCSVChecked)
+            {
+                csvPath = pCSVPath->text();
+                manageFile->checkDirectoryAndCreate(csvPath, this);
 
-//            for (int j=0; j < mitoses.size(); j++)
-//            {
-//                iPositive.push_back(Point(mitoses[j].x,mitoses[j].y));
-//                iiPositive.push_back(Point(mitoses[j].x,mitoses[j].y));
-//                iNegative.push_back(Point(notMitoses[j].x,notMitoses[j].y));
-//                iiNegative.push_back(Point(notMitoses[j].x+1,notMitoses[j].y+1));
-//            }
+                iWindowSize = ui->windowSizeLineEdit->text().toInt();
+                iOffset = iWindowSize/2;
+                iWindowSize = iWindowSize + 1;
+
+                ///Read CSV Files
+
+                QDir csvDirectory(csvPath);
+                csvDirectory.setSorting(QDir::Size | QDir::Reversed);
+
+                ///CSV type Filters List
+                QStringList csvFilters;
+                csvFilters << imageFileName + "*.csv";
+                QFileInfoList csvFileList = csvDirectory.entryInfoList(csvFilters, QDir::Files|QDir::NoDotAndDotDot);
+                for (int i = 0; i < csvFileList.size(); ++i)
+                {
+                    QFileInfo csvFileInfo = csvFileList.at(i);
+                    QString csvFileAbsolutePath = csvFileInfo.absoluteFilePath();
+                    QString csvFileName = manageFile->removeExtension(csvFileInfo.fileName());
+
+                    Vector<coordinateInfo> coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
+                    ///Write New Image Files
+                    manageImage->writeImages(coordinates, imageBase, destinationPath, csvFileName, imageFileExtension, this);
+
+                }
+
+            }
+            else {
+
+                ///Write New Image Files
+                manageImage->writeImages(imageBase, destinationPath, imageFileName, imageFileExtension, this);
+            }
 
         }
+
     }
+}
+
+void MainWindow::verifyCheckBoxes()
+{
+    bCropChecked = ui->cropCheckBox->isChecked();
+    bCSVChecked = ui->csvCheckBox->isChecked();
+    bFlipChecked = ui->flipCheckBox->isChecked();
+    bGrayChecked = ui->grayScaleCheckBox->isChecked();
+    bResizeChecked = ui->resizeCheckBox->isChecked();
+
 }
 
 void MainWindow::verifyForm(bool)
 {
     bool ok = true;
 
-    if ((pOriginalPath->text().isEmpty() || pOriginalPath->text().isNull()) ||
-        (pDestinationPath->text().isEmpty() || pDestinationPath->text().isNull()))
+    verifyCheckBoxes();
+
+    QMessageBox msgBox;
+    QString errorMsg;
+
+    if (pOriginalPath->text().isEmpty() || pOriginalPath->text().isNull())
     {
         ok = false;
+        errorMsg = "The input original path is empty!";
     }
-    else if (((!ui->cropCheckBox->isChecked()) && (ui->csvCheckBox->isChecked())) ||
-             ((ui->cropCheckBox->isChecked()) && (!ui->csvCheckBox->isChecked())) )
+    else if (pDestinationPath->text().isEmpty() || pDestinationPath->text().isNull())
     {
         ok = false;
+        errorMsg = "The input destination path is empty!";
     }
-    else if ((!ui->cropCheckBox->isChecked()) && (pCSVPath->text().isEmpty() || pCSVPath->text().isNull()) ||
-            ((ui->cropCheckBox->isChecked()) && (pCSVPath->text().isEmpty() || pCSVPath->text().isNull())) )
+    else if (((bCropChecked) && (ui->windowSizeLineEdit->text().isEmpty() || ui->windowSizeLineEdit->text().isNull())))
     {
         ok = false;
+        errorMsg = "The checkbox CSV is not checked! To crop an image you'll need a CSV file containing the coordinates for the crop.";
+    }
+    else if (((bCropChecked) && (!bCSVChecked)))
+    {
+        ok = false;
+        errorMsg = "The checkbox CSV is not checked! To crop an image you'll need a CSV file containing the coordinates for the crop.";
+    }
+    else if ((bCropChecked) && (pCSVPath->text().isEmpty() || pCSVPath->text().isNull()))
+    {
+        ok = false;
+        errorMsg = "The input CSV path is empty!";
     }
     else if (ui->resizeCheckBox->isChecked())
     {
-        if ((ui->widthLineEdit->text().isEmpty() || ui->widthLineEdit->text().isNull()) ||
-            (ui->heightLineEdit->text().isEmpty() || ui->heightLineEdit->text().isNull()) )
+        if (ui->widthLineEdit->text().isEmpty() || ui->widthLineEdit->text().isNull())
         {
             ok = false;
+            errorMsg = "The input width is empty!";
+        }
+        else if (ui->heightLineEdit->text().isEmpty() || ui->heightLineEdit->text().isNull())
+        {
+            ok = false;
+            errorMsg = "The input height is empty!";
         }
 
     }
 
     if (ok == true)
     {
-        generateMain();
+        generateImages();
+
+    } else {
+        msgBox.setText(errorMsg);
+        msgBox.exec();
     }
 
 }
-
 
 
