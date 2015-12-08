@@ -9,6 +9,7 @@
 #include <QSignalMapper>
 #include <QDir>
 
+
 enum PATH
 {
     ORIGINAL_PATH,

@@ -2,12 +2,16 @@
 #include "ui_mainwindow.h"
 #include "filemanipulation.h"
 #include "imagetransformation.h"
+#include "log.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    LogImgDataset::getInstance().Log(INFO,"Initializing ...");
 
     QApplication::setStyle(QStyleFactory::create("Plastique"));
     QApplication::setPalette(QApplication::style()->standardPalette());
@@ -56,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    LogImgDataset::getInstance().Log(INFO,"Quiting ...");
     delete ui;
 }
 
@@ -134,6 +139,8 @@ void MainWindow::generateImages()
     QString destinationPath = pDestinationPath->text();
     QString csvPath;
 
+    LogImgDataset::getInstance().Log(INFO, "Starting gerate images process ...");
+
     FileManipulation* manageFile = new FileManipulation();
     ImageTransformation* manageImage = new ImageTransformation();
 
@@ -150,7 +157,6 @@ void MainWindow::generateImages()
         filters << "*.png" << "*.jpg" << "*.bmp" << "*.tiff" << "*.gif";
         QFileInfoList list = directory.entryInfoList(filters, QDir::Files|QDir::NoDotAndDotDot);
 
-        //std::cout << "     Bytes Filename" << std::endl;
         for (int i = 0; i < list.size(); ++i)
         {
             QFileInfo imageFileInfo = list.at(i);
@@ -158,8 +164,8 @@ void MainWindow::generateImages()
             QString imageFileName = manageFile->removeExtension(imageFileInfo.fileName());
             QString imageFileExtension = manageFile->getExtension(imageFileInfo.fileName());
 
-            //std::cout << qPrintable(QString("%1 %2").arg(fileInfo.size(), 10).arg(fileInfo.fileName()));
-            //std::cout << std::endl;
+            QString logMessage = "Process image: " + imageFileName;
+            LogImgDataset::getInstance().Log(INFO, logMessage.toLocal8Bit().data());
 
             Mat imageBase = imread(imageFileAbsolutePath.toStdString());
             Mat imageCopy;
@@ -167,6 +173,7 @@ void MainWindow::generateImages()
 
             if (bGrayChecked)
             {
+                LogImgDataset::getInstance().Log(INFO, "Convert to grayscale");
                 cv::cvtColor(imageCopy, imageCopy, CV_RGB2GRAY);
                 imwrite((destinationPath + "/" + imageFileName + "_Gray" + imageFileExtension).toStdString(), imageCopy );
             }
@@ -175,6 +182,7 @@ void MainWindow::generateImages()
             {
                 /// Generate some generic points
                 /// Usually you would use a interest point detector such as SURF or SIFT
+                LogImgDataset::getInstance().Log(INFO, "Applying Thin Plate Spline");
                 std::vector<cv::Point> iP, iiP;
                 manageImage->thinPlateSplineProcessing(imageCopy, destinationPath, imageFileAbsolutePath, iP, iiP);
 
@@ -204,14 +212,19 @@ void MainWindow::generateImages()
                     QString csvFileAbsolutePath = csvFileInfo.absoluteFilePath();
                     QString csvFileName = manageFile->removeExtension(csvFileInfo.fileName());
 
+                    QString logMessage = "Reading CSV file: "+ csvFileName;
+                    LogImgDataset::getInstance().Log(INFO, logMessage.toLocal8Bit().data());
+
                     Vector<coordinateInfo> coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
+
                     ///Write New Image Files
                     manageImage->writeImages(coordinates, imageBase, destinationPath, csvFileName, imageFileExtension, this);
 
                 }
 
             }
-            else {
+            else
+            {
 
                 ///Write New Image Files
                 manageImage->writeImages(imageBase, destinationPath, imageFileName, imageFileExtension, this);
@@ -219,6 +232,15 @@ void MainWindow::generateImages()
 
         }
 
+    }
+    else
+    {
+        QMessageBox msgBox;
+        QString errorMsg = "Directory "+originalPath+" not exist!";
+        msgBox.setText(errorMsg);
+        msgBox.exec();
+
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
 }
 
@@ -236,6 +258,8 @@ void MainWindow::verifyForm(bool)
 {
     bool ok = true;
 
+    LogImgDataset::getInstance().Log(INFO, "Validating form ...");
+
     verifyCheckBoxes();
 
     QMessageBox msgBox;
@@ -245,26 +269,37 @@ void MainWindow::verifyForm(bool)
     {
         ok = false;
         errorMsg = "The input original path is empty!";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
     else if (pDestinationPath->text().isEmpty() || pDestinationPath->text().isNull())
     {
         ok = false;
         errorMsg = "The input destination path is empty!";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
+    }
+    else if (!bCropChecked && !bCSVChecked && !bFlipChecked && !bGrayChecked && !bResizeChecked && !bRotateChecked && !bTSPChecked)
+    {
+        ok = false;
+        errorMsg = "Check at least one checkbox!";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
     else if (((bCropChecked) && (ui->windowSizeLineEdit->text().isEmpty() || ui->windowSizeLineEdit->text().isNull())))
     {
         ok = false;
         errorMsg = "The checkbox CSV is not checked! To crop an image you'll need a CSV file containing the coordinates for the crop.";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
     else if (((bCropChecked) && (!bCSVChecked)))
     {
         ok = false;
         errorMsg = "The checkbox CSV is not checked! To crop an image you'll need a CSV file containing the coordinates for the crop.";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
     else if ((bCropChecked) && (pCSVPath->text().isEmpty() || pCSVPath->text().isNull()))
     {
         ok = false;
         errorMsg = "The input CSV path is empty!";
+        LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
     }
     else if (ui->resizeCheckBox->isChecked())
     {
@@ -272,11 +307,13 @@ void MainWindow::verifyForm(bool)
         {
             ok = false;
             errorMsg = "The input width is empty!";
+            LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
         }
         else if (ui->heightLineEdit->text().isEmpty() || ui->heightLineEdit->text().isNull())
         {
             ok = false;
             errorMsg = "The input height is empty!";
+            LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
         }
 
     }

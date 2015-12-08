@@ -1,6 +1,7 @@
 #include "filemanipulation.h"
 #include <stdio.h>
 #include <iostream>
+#include "log.h"
 
 FileManipulation::FileManipulation()
 {
@@ -145,6 +146,8 @@ bool FileManipulation::checkDirectoryAndCreate(QString dir, QWidget* widget)
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(widget, "Directory not exist.", "The directory"+ dir + " not exist. Do you want create it?", QMessageBox::Yes|QMessageBox::No);
 
+        LogImgDataset::getInstance().Log(ERROR, "Directory not exist.");
+
         if (reply == QMessageBox::Yes) {
 
             directory.mkdir(dir);
@@ -155,6 +158,7 @@ bool FileManipulation::checkDirectoryAndCreate(QString dir, QWidget* widget)
             QMessageBox msgBox;
             msgBox.setText("The destination directory not exist. Use a valid destination directory");
             msgBox.exec();
+            LogImgDataset::getInstance().Log(ERROR, "The destination directory not exist. Use a valid destination directory");
 
         }
     }

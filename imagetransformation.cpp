@@ -1,4 +1,5 @@
 #include "imagetransformation.h"
+#include "log.h"
 
 ImageTransformation::ImageTransformation()
 {
@@ -51,6 +52,8 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
         int width = mainW->iWidth;
         int height = mainW->iHeight;
         imageTemp.resize(width,height);
+
+        LogImgDataset::getInstance().Log(INFO, "Resize image");
     }
 
     if (mainW->bRotateChecked)
@@ -66,6 +69,8 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
         imwrite((destinationPath + "/" + fileName + "_R180" + extension).toStdString(), imageRotate180 );
         imwrite((destinationPath + "/" + fileName + "_R270" + extension).toStdString(), imageRotate270 );
 
+        LogImgDataset::getInstance().Log(INFO, "Rotate images: 0 - 90 - 180 - 270");
+
         if (mainW->bFlipChecked)
         {
             ///Vertical Flip in Rotate Images
@@ -78,6 +83,8 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
             imwrite((destinationPath + "/" + fileName + "_FlipV90" + extension).toStdString(), imageFlipV90 );
             imwrite((destinationPath + "/" + fileName + "_FlipV180" + extension).toStdString(), imageFlipV180 );
             imwrite((destinationPath + "/" + fileName + "_FlipV270" + extension).toStdString(), imageFlipV270 );
+
+            LogImgDataset::getInstance().Log(INFO, "Fliping ...");
         }
 
     }
@@ -86,6 +93,8 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
         ///Vertical Flip in Rotate Images
         Mat imageFlipV0 = flipImage(imageRotate0, 1);
         imwrite((destinationPath + "/" + fileName + "_FlipV0" + ".jpg").toStdString(), imageFlipV0 );
+
+        LogImgDataset::getInstance().Log(INFO, "Fliping ...");
     }
 
 }
@@ -111,6 +120,8 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             int iWidth = mainW->iWidth;
             int iHeight = mainW->iHeight;
             imageTemp.resize(iWidth,iHeight);
+
+            LogImgDataset::getInstance().Log(INFO, "Resize image");
         }
 
         if (mainW->bCropChecked) {
@@ -120,6 +131,8 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             Mat imageCrop = cropImage(imageTemp, Point(coordinates[j].x,coordinates[j].y), cv::Size(mainW->iWindowSize,mainW->iWindowSize), mainW->iOffset);
             imwrite((destinationPath + "/" + fileName + number + extension).toStdString(), imageCrop);
             imageTemp = imageCrop;
+
+            LogImgDataset::getInstance().Log(INFO, "Crop image");
         }
 
         if (mainW->bRotateChecked)
@@ -135,6 +148,8 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             imwrite((destinationPath + "/" + fileName + number + "_R180" + extension).toStdString(), imageRotate180 );
             imwrite((destinationPath + "/" + fileName + number + "_R270" + extension).toStdString(), imageRotate270 );
 
+            LogImgDataset::getInstance().Log(INFO, "Rotate images: 0 - 90 - 180 - 270");
+
             if (mainW->bFlipChecked)
             {
                 ///Vertical Flip in Rotate Images
@@ -147,6 +162,8 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV90" + extension).toStdString(), imageFlipV90 );
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV180" + extension).toStdString(), imageFlipV180 );
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV270" + extension).toStdString(), imageFlipV270 );
+
+                LogImgDataset::getInstance().Log(INFO, "Fliping ...");
             }
 
         }
@@ -155,6 +172,9 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             ///Vertical Flip in Rotate Images
             Mat imageFlipV0 = flipImage(imageRotate0, 1);
             imwrite((destinationPath + "/" + fileName + number + "_FlipV0" + ".jpg").toStdString(), imageFlipV0 );
+
+            LogImgDataset::getInstance().Log(INFO, "Fliping ...");
+
         }
 
     }
