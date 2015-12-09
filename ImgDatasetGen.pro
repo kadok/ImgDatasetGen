@@ -71,4 +71,3 @@ LIBS += -llog4cpp
 
 DISTFILES += \
     log4cpp.properties
-

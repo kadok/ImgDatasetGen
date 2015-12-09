@@ -34,4 +34,3 @@ void LogImgDataset::Log(int type, char *content)
 }
 
 
-
