@@ -15,14 +15,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     imagetransformation.cpp \
-    ThinPlateSpline/CThinPlateSpline.cpp \
-    filemanipulation.cpp
+    filemanipulation.cpp \
+    log.cpp \
+    CThinPlateSpline.cpp
 
 HEADERS  += mainwindow.h \
     imagetransformation.h \
-    ThinPlateSpline/constants.h \
-    ThinPlateSpline/CThinPlateSpline.h \
-    filemanipulation.h
+    filemanipulation.h \
+    log.h \
+    constants.h \
+    CThinPlateSpline.h
 
 FORMS    += mainwindow.ui
 
@@ -62,4 +64,11 @@ LIBS += -lrt
 LIBS += -lpthread
 LIBS += -lm
 LIBS += -ldl
+
+INCLUDEPATH += /usr/local/include/log4cpp
+LIBS += -L"/usr/local/lib"
+LIBS += -llog4cpp
+
+DISTFILES += \
+    log4cpp.properties
 

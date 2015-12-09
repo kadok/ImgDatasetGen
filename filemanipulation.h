@@ -17,7 +17,7 @@
 
 
 /**
- * @file
+ * @file FileManipulation.h
  * @author  Renato Moraes <rmoraes@inf.puc-rio.br>
  * @version 1.0
  *
@@ -36,7 +36,12 @@
  *
  * @section DESCRIPTION
  *
- * The class FileManipulation represents the manipulations realized with files and directories.
+ *
+ */
+
+/**
+ * @class FileManipulation
+ * @brief The FileManipulation class - The class FileManipulation represents the manipulations realized with files and directories.
  */
 class FileManipulation : public QDir
 {
@@ -103,8 +108,8 @@ class FileManipulation : public QDir
         bool checkDirectoryAndCreate(QString dir, QWidget* widget);
 
     private:
-        QString fileExtension;
-        QString fileName;
+        QString fileExtension; /*!< File extension */
+        QString fileName; /*!< Filename */
 
 
 };

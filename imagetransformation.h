@@ -10,21 +10,23 @@
 
 #include "mainwindow.h"
 
-#include "ThinPlateSpline/CThinPlateSpline.h"
-#include "ThinPlateSpline/constants.h"
+#include "CThinPlateSpline.h"
+#include "constants.h"
 
-///Struct to define a coordinate extracted from a CSV file.
+/**
+ * @brief Struct to define a coordinate extracted from a CSV file.
+ */
 struct coordinateInfo {
-    double x;
-    double y;
-    double grade;
+    double x; /*!< Interest region x coordinate. */
+    double y; /*!< Interest region y coordinate. */
+    double grade; /*!< Interest region grade. */
 };
 
 using namespace cv;
 
 
 /**
- * @file
+ * @file imagetransformation.h
  * @author  Renato Moraes <rmoraes@inf.puc-rio.br>
  * @version 1.0
  *
@@ -43,7 +45,12 @@ using namespace cv;
  *
  * @section DESCRIPTION
  *
- * The class ImageTransformation represents the transformations realized with images.
+ *
+ */
+
+/**
+ * @class ImageTransformation
+ * @brief The ImageTransformation class - The class ImageTransformation represents the transformations realized with images.
  */
 class ImageTransformation : public QImage
 {
@@ -87,7 +94,7 @@ class ImageTransformation : public QImage
         /**
          * @brief thinPlateSplineProcessing - Process the Thin Plate Spline on image.
          * @param originalImage - Original image.
-         * @param destinantionPath - Destination path.
+         * @param destinationPath - Destination path.
          * @param fileName - Filename.
          * @param iP - Points Vector.
          * @param iiP - Points Vector.
@@ -117,9 +124,9 @@ class ImageTransformation : public QImage
 
 
     private:
-        Point coordinate;
-        Size rectSize;
-        int offset;
+        Point coordinate; /*!< Point coordinate. */
+        Size rectSize; /*!< Rect size. */
+        int offset; /*!< Offset to adjust size. */
 
 };
 

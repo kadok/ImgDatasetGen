@@ -9,6 +9,7 @@
 #include <QSignalMapper>
 #include <QDir>
 
+
 enum PATH
 {
     ORIGINAL_PATH,
@@ -21,7 +22,7 @@ class MainWindow;
 }
 
 /**
- * @file
+ * @file mainwindow.h
  * @author  Renato Moraes <rmoraes@inf.puc-rio.br>
  * @version 1.0
  *
@@ -40,7 +41,11 @@ class MainWindow;
  *
  * @section DESCRIPTION
  *
- * The class MainWindow represents the main window of the system.
+ */
+
+/**
+ * @class MainWindow
+ * @brief The MainWindow class - The class MainWindow represents the main window of the system.
  */
 class MainWindow : public QMainWindow
 {
@@ -68,26 +73,26 @@ public:
      */
     void verifyCheckBoxes();
 
-    bool bFlipChecked;
-    bool bRotateChecked;
-    bool bResizeChecked;
-    bool bGrayChecked;
-    bool bTSPChecked;
-    bool bCropChecked;
-    bool bCSVChecked;
+    bool bFlipChecked; /*!< Flag to verify if Flip checkbox is checked declaration. */
+    bool bRotateChecked; /*!< Flag to verify if Rotate checkbox is checked declaration. */
+    bool bResizeChecked; /*!< Flag to verify if Resize checkbox is checked declaration. */
+    bool bGrayChecked; /*!< Flag to verify if Grayscale checkbox is checked declaration. */
+    bool bTSPChecked; /*!< Flag to verify if Thin Plane Spline checkbox is checked declaration. */
+    bool bCropChecked; /*!< Flag to verify if Crop checkbox is checked declaration. */
+    bool bCSVChecked; /*!< Flag to verify if CSV checkbox is checked declaration. */
 
-    int iWidth;
-    int iHeight;
+    int iWidth; /*!< Rect width */
+    int iHeight; /*!< Rect height */
 
-    int iWindowSize;
-    int iOffset;
+    int iWindowSize; /*!< Window size */
+    int iOffset; /*!< Windown offset */
 
 private:
-    Ui::MainWindow *ui;
-    QPushButton* pButton;
-    QLineEdit* pOriginalPath;
-    QLineEdit* pDestinationPath;
-    QLineEdit* pCSVPath;
+    Ui::MainWindow *ui; /*!< Ui declaration. */
+    QPushButton* pButton; /*!< Generic button. */
+    QLineEdit* pOriginalPath; /*!< Original path form input */
+    QLineEdit* pDestinationPath; /*!< Destination path form input */
+    QLineEdit* pCSVPath; /*!< CSV path form input */
 
 
 protected:
@@ -102,12 +107,12 @@ protected:
     virtual void  createMenus();
 
 
-    QMenu *fileMenu;
-    QMenu *helpMenu;
+    QMenu *fileMenu; /*!< Main menu declaration */
+    QMenu *helpMenu; /*!< Help menu declaration */
 
-    QAction *newAct;
-    QAction *exitAct;
-    QAction *aboutAct;
+    QAction *newAct; /*!< New action declaration. */
+    QAction *exitAct; /*!< Exit action declaration. */
+    QAction *aboutAct; /*!< About action declaration. */
 
 private slots:
     /**

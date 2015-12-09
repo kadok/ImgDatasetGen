@@ -1,4 +1,5 @@
 #include "imagetransformation.h"
+#include "log.h"
 
 ImageTransformation::ImageTransformation()
 {
@@ -51,11 +52,13 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
         int width = mainW->iWidth;
         int height = mainW->iHeight;
         imageTemp.resize(width,height);
+
+        LogImgDataset::getInstance().Log(INFO, "Resize image");
     }
 
     if (mainW->bRotateChecked)
     {
-        ///Rotate Images 0 - 90 - 180 -270
+        //Rotate Images 0 - 90 - 180 -270
         imageRotate0 = imageTemp;
         imageRotate90 = rotateImage(imageTemp, 90.0);
         imageRotate180 = rotateImage(imageTemp, 180.0);
@@ -66,9 +69,11 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
         imwrite((destinationPath + "/" + fileName + "_R180" + extension).toStdString(), imageRotate180 );
         imwrite((destinationPath + "/" + fileName + "_R270" + extension).toStdString(), imageRotate270 );
 
+        LogImgDataset::getInstance().Log(INFO, "Rotate images: 0 - 90 - 180 - 270");
+
         if (mainW->bFlipChecked)
         {
-            ///Vertical Flip in Rotate Images
+            //Vertical Flip in Rotate Images
             Mat imageFlipV0 = flipImage(imageRotate0, 1);
             Mat imageFlipV90 = flipImage(imageRotate90, 1);
             Mat imageFlipV180 = flipImage(imageRotate180, 1);
@@ -78,14 +83,18 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
             imwrite((destinationPath + "/" + fileName + "_FlipV90" + extension).toStdString(), imageFlipV90 );
             imwrite((destinationPath + "/" + fileName + "_FlipV180" + extension).toStdString(), imageFlipV180 );
             imwrite((destinationPath + "/" + fileName + "_FlipV270" + extension).toStdString(), imageFlipV270 );
+
+            LogImgDataset::getInstance().Log(INFO, "Fliping ...");
         }
 
     }
     else if (mainW->bFlipChecked)
     {
-        ///Vertical Flip in Rotate Images
+        //Vertical Flip in Rotate Images
         Mat imageFlipV0 = flipImage(imageRotate0, 1);
         imwrite((destinationPath + "/" + fileName + "_FlipV0" + ".jpg").toStdString(), imageFlipV0 );
+
+        LogImgDataset::getInstance().Log(INFO, "Fliping ...");
     }
 
 }
@@ -93,7 +102,7 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
 void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW)
 {
 
-    ///Crop the interest area
+    //Crop the interest area
     for (uint j=0; j < coordinates.size(); j++)
     {
         QString number = "_" + QString::number(j);
@@ -111,20 +120,24 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             int iWidth = mainW->iWidth;
             int iHeight = mainW->iHeight;
             imageTemp.resize(iWidth,iHeight);
+
+            LogImgDataset::getInstance().Log(INFO, "Resize image");
         }
 
         if (mainW->bCropChecked) {
 
-            ///Recorte da imagem a partir dos dados dos CSVs
+            //Recorte da imagem a partir dos dados dos CSVs
             QString number = "_" + QString::number(j);
             Mat imageCrop = cropImage(imageTemp, Point(coordinates[j].x,coordinates[j].y), cv::Size(mainW->iWindowSize,mainW->iWindowSize), mainW->iOffset);
             imwrite((destinationPath + "/" + fileName + number + extension).toStdString(), imageCrop);
             imageTemp = imageCrop;
+
+            LogImgDataset::getInstance().Log(INFO, "Crop image");
         }
 
         if (mainW->bRotateChecked)
         {
-            ///Rotate Images 0 - 90 - 180 -270
+            //Rotate Images 0 - 90 - 180 -270
             imageRotate0 = imageTemp;
             imageRotate90 = rotateImage(imageTemp, 90.0);
             imageRotate180 = rotateImage(imageTemp, 180.0);
@@ -135,9 +148,11 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
             imwrite((destinationPath + "/" + fileName + number + "_R180" + extension).toStdString(), imageRotate180 );
             imwrite((destinationPath + "/" + fileName + number + "_R270" + extension).toStdString(), imageRotate270 );
 
+            LogImgDataset::getInstance().Log(INFO, "Rotate images: 0 - 90 - 180 - 270");
+
             if (mainW->bFlipChecked)
             {
-                ///Vertical Flip in Rotate Images
+                //Vertical Flip in Rotate Images
                 Mat imageFlipV0 = flipImage(imageRotate0, 1);
                 Mat imageFlipV90 = flipImage(imageRotate90, 1);
                 Mat imageFlipV180 = flipImage(imageRotate180, 1);
@@ -147,14 +162,19 @@ void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat im
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV90" + extension).toStdString(), imageFlipV90 );
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV180" + extension).toStdString(), imageFlipV180 );
                 imwrite((destinationPath + "/" + fileName + number + "_FlipV270" + extension).toStdString(), imageFlipV270 );
+
+                LogImgDataset::getInstance().Log(INFO, "Fliping ...");
             }
 
         }
         else if (mainW->bFlipChecked)
         {
-            ///Vertical Flip in Rotate Images
+            //Vertical Flip in Rotate Images
             Mat imageFlipV0 = flipImage(imageRotate0, 1);
             imwrite((destinationPath + "/" + fileName + number + "_FlipV0" + ".jpg").toStdString(), imageFlipV0 );
+
+            LogImgDataset::getInstance().Log(INFO, "Fliping ...");
+
         }
 
     }
@@ -166,10 +186,10 @@ void ImageTransformation::thinPlateSplineProcessing(Mat originalImage, QString d
 
     Mat thinPlateSplineImage;
 
-    /// Create thin plate spline object and put the vectors into the constructor
+    // Create thin plate spline object and put the vectors into the constructor
     tps= new CThinPlateSpline(iP,iiP);
 
-    /// Warp the image to dst
+    // Warp the image to dst
     tps->warpImage(originalImage,thinPlateSplineImage,0.01,INTER_CUBIC,BACK_WARP);
 
     imwrite((destinationPath + fileName + "_TPS" + ".jpg").toStdString(), thinPlateSplineImage );
