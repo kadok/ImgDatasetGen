@@ -4,10 +4,10 @@
 *  Created on: 24.01.2010
 *      Author: schmiedm
 */
-
+#include <opencv2/opencv.hpp>
 #include <vector>
-#include <cv.h>
-#include <cxcore.h>
+#include <opencv/cv.h>
+#include <opencv/cxcore.h>
 #include "CThinPlateSpline.h"
 using namespace cv;
 

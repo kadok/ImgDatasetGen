@@ -4,9 +4,8 @@
 #include <QObject>
 #include <QImage>
 
-#include "opencv2/core/core.hpp"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+#include <opencv2/opencv.hpp>
+#include <vector>
 
 #include "mainwindow.h"
 
@@ -23,6 +22,7 @@ struct coordinateInfo {
 };
 
 using namespace cv;
+using namespace std;
 
 
 /**
@@ -120,7 +120,7 @@ class ImageTransformation : public QImage
          * @param extension - File extension.
          * @param mainW - MainWindow.
          */
-        void writeImages(Vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
+        void writeImages(vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
 
 
     private:

@@ -215,7 +215,7 @@ void MainWindow::generateImages()
                     QString logMessage = "Reading CSV file: "+ csvFileName;
                     LogImgDataset::getInstance().Log(INFO, logMessage.toLocal8Bit().data());
 
-                    Vector<coordinateInfo> coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
+                    vector<coordinateInfo> coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
 
                     //Write New Image Files
                     manageImage->writeImages(coordinates, imageBase, destinationPath, csvFileName, imageFileExtension, this);

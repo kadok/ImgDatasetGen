@@ -75,7 +75,7 @@ class FileManipulation : public QDir
          * @param separator - Separator.
          * @return Return a vector with points found on CSV file.
          */
-        Vector<Point> csvReaderPoints(QString fileName, const QString separator);
+        vector<Point> csvReaderPoints(QString fileName, const QString separator);
 
         /**
          * @brief csvReaderCoordinates - Read CSV file to getting the image coordinates.
@@ -83,7 +83,7 @@ class FileManipulation : public QDir
          * @param separator - Separator.
          * @return Return a vector with coordinates found on CSV file.
          */
-        Vector<coordinateInfo> csvReaderCoordinates(QString fileName, const QString separator);
+        vector<coordinateInfo> csvReaderCoordinates(QString fileName, const QString separator);
 
         /**
          * @brief csvReaderVectorPoints - Read CSV file to getting especific coordinates points.
@@ -91,7 +91,7 @@ class FileManipulation : public QDir
          * @param separator - Separator.
          * @return Return a vector with vector of especific coordinates points.
          */
-        Vector<Vector<Point> > csvReaderVectorPoints(QString fileName, const QString separator);
+        vector<vector<Point> > csvReaderVectorPoints(QString fileName, const QString separator);
 
         /**
          * @brief checkDirectory - Check directory.

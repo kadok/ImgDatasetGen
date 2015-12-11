@@ -8,9 +8,9 @@ FileManipulation::FileManipulation()
 
 }
 
-Vector<Point> FileManipulation::csvReaderPoints(QString fileName, const QString separator)
+vector<Point> FileManipulation::csvReaderPoints(QString fileName, const QString separator)
 {
-    Vector<Point> pointVector;
+    vector<Point> pointVector;
     pointVector.clear();
 
     QFile file(fileName);
@@ -36,9 +36,9 @@ Vector<Point> FileManipulation::csvReaderPoints(QString fileName, const QString 
 
 }
 
-Vector<coordinateInfo> FileManipulation::csvReaderCoordinates(QString fileName, const QString separator)
+vector<coordinateInfo> FileManipulation::csvReaderCoordinates(QString fileName, const QString separator)
 {
-    Vector<coordinateInfo> pointVector;
+    vector<coordinateInfo> pointVector;
     pointVector.clear();
 
     coordinateInfo mCoordinates;
@@ -66,10 +66,10 @@ Vector<coordinateInfo> FileManipulation::csvReaderCoordinates(QString fileName, 
 
 }
 
-Vector<Vector<Point> > FileManipulation::csvReaderVectorPoints(QString fileName, const QString separator)
+vector<vector<Point> > FileManipulation::csvReaderVectorPoints(QString fileName, const QString separator)
 {
-    Vector<Vector<Point> > vectorPointVector;
-    Vector<Point> pointVector;
+    vector<vector<Point> > vectorPointVector;
+    vector<Point> pointVector;
     vectorPointVector.clear();
     pointVector.clear();
 

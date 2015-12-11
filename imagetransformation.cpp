@@ -99,7 +99,7 @@ void ImageTransformation::writeImages(Mat imageBase, QString destinationPath, QS
 
 }
 
-void ImageTransformation::writeImages(Vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW)
+void ImageTransformation::writeImages(vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW)
 {
 
     //Crop the interest area
