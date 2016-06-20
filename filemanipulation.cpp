@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <iostream>
 #include "log.h"
+#include "constants.h"
 
 FileManipulation::FileManipulation()
 {
@@ -166,3 +167,31 @@ bool FileManipulation::checkDirectoryAndCreate(QString dir, QWidget* widget)
     return exists;
 
 }
+
+void FileManipulation::createSubDirs(QString destinationPath)
+{
+    ///Root destination directory
+    QDir destinationDirectory(destinationPath);
+    //destinationDirectory.mkdir(destinationPath);
+    destinationDirectory.mkdir(rotateImagesPath);
+    destinationDirectory.mkdir(originalPath);
+    destinationDirectory.mkdir(thinPlateSplinesImagesPath);
+    destinationDirectory.mkdir(resizesPath);
+    destinationDirectory.mkdir(cropPath);
+
+    ///Tree
+    rotDir = destinationPath + "/" + rotateImagesPath;
+    oriDir = destinationPath + "/" + originalPath;
+    tpsDir = destinationPath + "/" + thinPlateSplinesImagesPath;
+    resDir = destinationPath + "/" + resizesPath;
+    cropDir = destinationPath + "/" + cropPath;
+
+    tpsOrigDir = tpsDir + originalPath;
+    tpsRotDir = tpsDir + rotateImagesPath;
+
+    QDir pTpsDirectory(tpsDir);
+    pTpsDirectory.mkdir(originalPath);
+    pTpsDirectory.mkdir(rotateImagesPath);
+
+}
+

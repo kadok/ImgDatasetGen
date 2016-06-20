@@ -107,9 +107,24 @@ class FileManipulation : public QDir
          */
         bool checkDirectoryAndCreate(QString dir, QWidget* widget);
 
+        /**
+         * @brief createSubDirs - Create sub directories
+         * @param destinationPath - Destination path
+         */
+        void createSubDirs(QString destinationPath);
+
     private:
         QString fileExtension; /*!< File extension */
         QString fileName; /*!< Filename */
+
+        ///Tree
+        QString rotDir;
+        QString oriDir;
+        QString tpsDir;
+        QString tpsOrigDir;
+        QString tpsRotDir;
+        QString cropDir;
+        QString resDir;
 
 
 };

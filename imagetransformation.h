@@ -55,6 +55,9 @@ using namespace std;
 class ImageTransformation : public QImage
 {
     public:
+
+        vector<coordinateInfo> coordinates; /*!< Interest area coordinates. */
+
         /**
          * @brief ImageTransformation - Constructor.
          */
@@ -100,6 +103,17 @@ class ImageTransformation : public QImage
          * @param iiP - Points Vector.
          */
         void thinPlateSplineProcessing(Mat originalImage, QString destinationPath, QString fileName, std::vector<cv::Point> iP, std::vector<cv::Point> iiP);
+        Mat thinPlateSplineProcessing(Mat originalImage, Mat thinPlateSplineImage, std::vector<cv::Point> iP, std::vector<cv::Point> iiP);
+
+        /**
+         * @brief writeImage - Write transformed image.
+         * @param imageBase - Original image.
+         * @param destinationPath - Destination path.
+         * @param fileName - Filename.
+         * @param extension - File extension.
+         * @param mainW - MainWindow.
+         */
+        void writeImage(Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
 
         /**
          * @brief writeImages - Write transformed images.
@@ -121,6 +135,95 @@ class ImageTransformation : public QImage
          * @param mainW - MainWindow.
          */
         void writeImages(vector<coordinateInfo> coordinates, Mat imageBase, QString destinationPath, QString fileName, QString extension, MainWindow* mainW);
+
+        /**
+         * @brief generateGrid Generate Grid for deformation
+         * @param originalImage Original Image
+         * @param cols Image columns size
+         * @param rows Image rows size
+         * @param inc pixel shift value
+         * @return Return a vector of points
+         */
+        vector<Point> generateGrid(Mat originalImage, int cols, int rows, float inc);
+
+        /**
+         * @brief random2DAffineTransformParams
+         * @param scaleMin
+         * @param scaleMax
+         * @param scale_x
+         * @param scale_y
+         * @param rotMin
+         * @param rotMax
+         * @param thetaRad
+         * @param transMin
+         * @param transMax
+         * @param tx
+         * @param ty
+         */
+        void random2DAffineTransformParams( const double scaleMin, const double scaleMax, double &scale_x, double &scale_y, const int rotMin, const int rotMax, double &thetaRad, const double transMin, const double transMax, double &tx, double &ty);
+
+        /**
+         * @brief param2matrix_2DAffineTransform
+         * @param Aff
+         * @param scale_x
+         * @param scale_y
+         * @param thetaRad
+         * @param tx
+         * @param ty
+         * @param orig_x
+         * @param orig_y
+         */
+        void param2matrix_2DAffineTransform(double Aff[2][3], double scale_x, double scale_y, double thetaRad, double tx, double  ty, const double orig_x, const double orig_y);
+
+        /**
+         * @brief pointsRandomTransformInLayers
+         * @param iP
+         * @param iiP
+         * @param w
+         * @param h
+         * @return
+         */
+        int pointsRandomTransformInLayers(vector<cv::Point> iP, vector<cv::Point> &iiP, int w, int h);
+
+        /**
+         * @brief cropROI
+         * @param points
+         * @param image
+         * @return
+         */
+        Mat cropROI(vector<Point> points, Mat image);
+
+        /**
+         * @brief centerCropROI
+         * @param points
+         * @return
+         */
+        Point centerCropROI(vector<Point> points);
+
+        /**
+         * @brief calculateDistance
+         * @param pt1
+         * @param pt2
+         * @return
+         */
+        double calculateDistance(const Point& pt1, const Point& pt2);
+
+        /**
+         * @brief changeGrid
+         * @param pointVector
+         * @param mitosis
+         * @return
+         */
+        vector<Point> changeGrid(vector<Point> pointVector, vector<coordinateInfo> mitosis);
+
+        /**
+         * @brief getPointsRandomTransformation
+         * @param iP
+         * @param mx
+         * @param my
+         * @return
+         */
+        vector<cv::Point> getPointsRandomTransformation(vector<cv::Point> iP, Mat_<float> mx, Mat_<float> my);
 
 
     private:

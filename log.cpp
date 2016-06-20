@@ -1,8 +1,16 @@
 #include "log.h"
+#include <QString>
+#include <QDir>
 
 LogImgDataset::LogImgDataset()
 {
-    app = new log4cpp::FileAppender("fileAppender", "imgDatasetGen.log");
+    QString homePath = QDir::homePath();
+    QString newPath = QDir::homePath() + "/ImgDatasetGen";
+    if( !QDir( newPath ).exists() )
+         QDir( homePath ).mkdir( "ImgDatasetGen" );
+
+    QString path = QDir::homePath() + "/ImgDatasetGen/imgDatasetGen.log";
+    app = new log4cpp::FileAppender("fileAppender", path.toStdString());
 }
 
 LogImgDataset::~LogImgDataset()
@@ -22,7 +30,7 @@ void LogImgDataset::Log(int type, char *content)
     //log4cpp::Appender *app = new log4cpp::FileAppender("fileAppender", "imgDatasetGen.log");
     app->setLayout(plt);
 
-    log4cpp::Category &root = log4cpp::Category::getRoot().getInstance("Test");
+    log4cpp::Category &root = log4cpp::Category::getRoot().getInstance("ImgDataSetGen");
     root.addAppender(app);
     root.setPriority(log4cpp::Priority::DEBUG);
     switch(type){

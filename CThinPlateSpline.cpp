@@ -291,7 +291,6 @@ void CThinPlateSpline::warpImage(const Mat& src, Mat& dst, float lambda, const i
     }
 
     computeMaps(size,mapx,mapy);
-    //crisnv: acrescentei esse 1 para fundo branco
     remap(src,dst,mapx,mapy,interpolation, 1);
 }
 

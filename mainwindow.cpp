@@ -3,7 +3,7 @@
 #include "filemanipulation.h"
 #include "imagetransformation.h"
 #include "log.h"
-
+#include "constants.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -68,8 +68,8 @@ void MainWindow::createActions()
 {
     newAct = new QAction(tr("&New"), this);
     newAct->setShortcut(tr("Ctrl+N"));
-    newAct->setStatusTip(tr("Create new file"));
-    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
+    newAct->setStatusTip(tr("Create new proccess"));
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newForm()));
 
     exitAct = new QAction(tr("Quit"), this);
     exitAct->setShortcut(tr("Ctrl+Q"));
@@ -101,7 +101,7 @@ void MainWindow::createMenus()
 void MainWindow::about()
 {
     QMessageBox::about(this, tr("Image Dataset Generator"),
-                       tr("Version 1.0 - © 2015 - Developed by Renato Moraes"));
+                       tr("Version 1.2 - 2016 - Developed by Renato Moraes"));
 }
 
 void MainWindow::browse(int symbol)
@@ -135,27 +135,26 @@ void MainWindow::browse(int symbol)
 void MainWindow::generateImages()
 {
 
-    QString originalPath = pOriginalPath->text();
+    QString sourcePath = pOriginalPath->text();
     QString destinationPath = pDestinationPath->text();
     QString csvPath;
 
-    LogImgDataset::getInstance().Log(INFO, "Starting gerate images process ...");
+    LogImgDataset::getInstance().Log(INFO, "Starting generate images process ...");
 
     FileManipulation* manageFile = new FileManipulation();
     ImageTransformation* manageImage = new ImageTransformation();
 
-    if (manageFile->checkDirectory(originalPath))
+    if (manageFile->checkDirectory(sourcePath))
     {
 
         manageFile->checkDirectoryAndCreate(destinationPath, this);
+        manageFile->createSubDirs(destinationPath);
 
-        QDir directory(originalPath);
+        QDir directory(sourcePath);
         directory.setSorting(QDir::Size | QDir::Reversed);
 
         //Image type Filters List
-        QStringList filters;
-        filters << "*.png" << "*.jpg" << "*.bmp" << "*.tiff" << "*.gif";
-        QFileInfoList list = directory.entryInfoList(filters, QDir::Files|QDir::NoDotAndDotDot);
+        QFileInfoList list = directory.entryInfoList(imageFilters, QDir::Files|QDir::NoDotAndDotDot);
 
         for (int i = 0; i < list.size(); ++i)
         {
@@ -171,21 +170,14 @@ void MainWindow::generateImages()
             Mat imageCopy;
             imageBase.copyTo(imageCopy);
 
+            ///Original Image
+            imwrite((destinationPath + "/" + originalPath + imageFileName + imageFileExtension).toStdString(), imageCopy );
+
             if (bGrayChecked)
             {
                 LogImgDataset::getInstance().Log(INFO, "Convert to grayscale");
                 cv::cvtColor(imageCopy, imageCopy, CV_RGB2GRAY);
                 imwrite((destinationPath + "/" + imageFileName + "_Gray" + imageFileExtension).toStdString(), imageCopy );
-            }
-
-            if (bTSPChecked)
-            {
-                // Generate some generic points
-                // Usually you would use a interest point detector such as SURF or SIFT
-                LogImgDataset::getInstance().Log(INFO, "Applying Thin Plate Spline");
-                std::vector<cv::Point> iP, iiP;
-                manageImage->thinPlateSplineProcessing(imageCopy, destinationPath, imageFileAbsolutePath, iP, iiP);
-
             }
 
             if (bCSVChecked)
@@ -203,8 +195,7 @@ void MainWindow::generateImages()
                 csvDirectory.setSorting(QDir::Size | QDir::Reversed);
 
                 //CSV type Filters List
-                QStringList csvFilters;
-                csvFilters << imageFileName + "*.csv";
+                QStringList csvFilters = (QStringList() << imageFileName + csvFilter);
                 QFileInfoList csvFileList = csvDirectory.entryInfoList(csvFilters, QDir::Files|QDir::NoDotAndDotDot);
                 for (int i = 0; i < csvFileList.size(); ++i)
                 {
@@ -215,28 +206,61 @@ void MainWindow::generateImages()
                     QString logMessage = "Reading CSV file: "+ csvFileName;
                     LogImgDataset::getInstance().Log(INFO, logMessage.toLocal8Bit().data());
 
-                    vector<coordinateInfo> coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
+                    manageImage->coordinates = manageFile->csvReaderCoordinates(csvFileAbsolutePath, ",");
+
 
                     //Write New Image Files
-                    manageImage->writeImages(coordinates, imageBase, destinationPath, csvFileName, imageFileExtension, this);
+                    manageImage->writeImages(manageImage->coordinates, imageCopy, destinationPath, csvFileName, imageFileExtension, this);
 
                 }
 
             }
             else
             {
-
                 //Write New Image Files
-                manageImage->writeImages(imageBase, destinationPath, imageFileName, imageFileExtension, this);
+                manageImage->writeImages(imageCopy, destinationPath, imageFileName, imageFileExtension, this);
+            }
+
+
+            if (bTSPChecked)
+            {
+                /// Generate some generic points
+                /// Usually you would use a interest point detector such as SURF or SIFT
+                LogImgDataset::getInstance().Log(INFO, "Applying Thin Plate Spline");
+
+                std::vector<cv::Point> i, ii;
+
+                i = manageImage->generateGrid(imageCopy,5,5, 0);
+                ii = manageImage->generateGrid(imageCopy,5,5, pixelShift);
+
+
+                Mat thinPlateSplineImage;
+                thinPlateSplineImage = manageImage->thinPlateSplineProcessing(imageCopy, thinPlateSplineImage, i, ii);
+
+                if (bCSVChecked)
+                {
+                    manageImage->writeImages(manageImage->coordinates, thinPlateSplineImage, thinPlateSplinesImagesPath, imageFileName, imageFileExtension, this);
+                }
+                else
+                {
+                    manageImage->writeImage(thinPlateSplineImage, destinationPath, imageFileName, imageFileExtension, this);
+                }
+
             }
 
         }
+
+        QMessageBox msgEndBox;
+        msgEndBox.setText("Image processing complete.");
+        msgEndBox.exec();
+
+        LogImgDataset::getInstance().Log(INFO, "Image processing complete.");
 
     }
     else
     {
         QMessageBox msgBox;
-        QString errorMsg = "Directory "+originalPath+" not exist!";
+        QString errorMsg = "Directory "+sourcePath+" not exist!";
         msgBox.setText(errorMsg);
         msgBox.exec();
 
@@ -251,6 +275,8 @@ void MainWindow::verifyCheckBoxes()
     bFlipChecked = ui->flipCheckBox->isChecked();
     bGrayChecked = ui->grayScaleCheckBox->isChecked();
     bResizeChecked = ui->resizeCheckBox->isChecked();
+    bRotateChecked = ui->rotateCheckBox->isChecked();
+    bTSPChecked = ui->thinPlateSplinesCheckBox->isChecked();
 
 }
 
@@ -315,6 +341,10 @@ void MainWindow::verifyForm(bool)
             errorMsg = "The input height is empty!";
             LogImgDataset::getInstance().Log(ERROR, errorMsg.toLocal8Bit().data());
         }
+        else {
+            iWidth = ui->widthLineEdit->text().toInt();
+            iHeight = ui->heightLineEdit->text().toInt();
+        }
 
     }
 
@@ -328,4 +358,25 @@ void MainWindow::verifyForm(bool)
     }
 
 }
+
+void MainWindow::newForm()
+{
+
+    LogImgDataset::getInstance().Log(INFO, "New image proccessing form ...");
+
+    ui->cropCheckBox->setChecked(false);
+    ui->csvCheckBox->setChecked(false);
+    ui->flipCheckBox->setChecked(false);
+    ui->grayScaleCheckBox->setChecked(false);
+    ui->resizeCheckBox->setChecked(false);
+
+    pOriginalPath->clear();
+    pDestinationPath->clear();
+    ui->windowSizeLineEdit->clear();
+    ui->widthLineEdit->clear();
+    ui->heightLineEdit->clear();
+    ui->csvLineEdit->clear();
+
+}
+
 

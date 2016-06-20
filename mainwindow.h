@@ -128,9 +128,13 @@ private slots:
 
     /**
      * @brief verifyForm - Verify the form submit.
-     * @return Return boolean.
      */
     void verifyForm(bool);
+
+    /**
+     * @brief newForm - Clear the form.
+     */
+    void newForm();
 };
 
 #endif // MAINWINDOW_H

@@ -1,6 +1,8 @@
 #ifndef LOG_H
 #define LOG_H
 
+#define _GLIBCXX_USE_CXX11_ABI 0
+
 #include <log4cpp/Category.hh>
 #include <log4cpp/Appender.hh>
 #include <log4cpp/FileAppender.hh>
