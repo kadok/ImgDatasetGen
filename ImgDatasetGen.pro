@@ -11,6 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = ImgDatasetGen
 TEMPLATE = app
 
+CONFIG += staticlib
 
 SOURCES += main.cpp\
         mainwindow.cpp \

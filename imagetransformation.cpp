@@ -30,9 +30,23 @@ Mat ImageTransformation::flipImage(Mat originalImage, int flipCode)
 
 Mat ImageTransformation::cropImage(Mat originalImage, Point coordinate, Size rectSize, int offset)
 {
-    cv::Mat tempImage(originalImage);
-    cv::Rect rect = cv::Rect(coordinate.x - offset,coordinate.y - offset, rectSize.width, rectSize.height);
-    cv::Mat croppedImage = tempImage(rect);
+    cv::Mat dst(originalImage);
+
+    ///X
+    int x = coordinate.x - offset;
+    if (x < 0)
+        x = 0;
+    else if (x > originalImage.cols || x > originalImage.cols - rectSize.width)
+        x = originalImage.cols - rectSize.width;
+    ///Y
+    int y = coordinate.y - offset;
+    if (y < 0)
+        y = 0;
+    else if (y > originalImage.rows || y > originalImage.rows - rectSize.height)
+        y = originalImage.rows - rectSize.height;
+
+    cv::Rect rect = cv::Rect(x,y, rectSize.width, rectSize.height);
+    cv::Mat croppedImage = dst(rect);
     return croppedImage;
 }
 
